@@ -1,5 +1,6 @@
 package my.flashcard.b210910042;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -43,10 +44,25 @@ public class FlashCard {
             }
 
             for (Card card : organizedCards) {
-                System.out.println(card.getQuestion());
-                List<String> choices = card.getChoices();
+                List<String> choices;
+                String question;
+                int correctIndex;
+
+                if (invertCards) {
+                    // Асуултыг хариулт болгоно, зөв хариултаар уг асуултыг таалгана
+                    question = card.getChoices().get(card.getCorrectIndex()) + " гэж ямар асуултад хамаарах вэ?";
+                    choices = new ArrayList<>(card.getChoices()); // card.getQuestion() оруулаагүй!
+                    choices.set(card.getCorrectIndex(), card.getQuestion()); // зөв хариулт - асуулт
+                    correctIndex = card.getCorrectIndex(); // зөвийн индекс хэвээр
+                } else {
+                    question = card.getQuestion();
+                    choices = card.getChoices();
+                    correctIndex = card.getCorrectIndex();
+                }
+
+                System.out.println(question);
                 for (int i = 0; i < choices.size(); i++) {
-                    System.out.println((i + 1) + ". "+ choices.get(i));
+                    System.out.println((i + 1) + ": " + choices.get(i));
                 }
 
                 int userChoice = -1;
@@ -64,11 +80,11 @@ public class FlashCard {
                     }
                 }
 
-                if (userChoice == card.getCorrectIndex()) {
+                if (userChoice == correctIndex) {
                     System.out.println("Зөв!");
                     card.correct();
                 } else {
-                    System.out.println("Буруу хариулт !  " );
+                    System.out.println("Буруу! Зөв хариулт: " + choices.get(correctIndex));
                     card.wrong();
                 }
             }
