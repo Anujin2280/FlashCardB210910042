@@ -1,6 +1,7 @@
 package my.flashcard.b210910042;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public class FlashCard {
         Scanner scanner = new Scanner(System.in);
 
         for (int round = 1; round <= repetitions; round++) {
-            System.out.println("\n=== Давталт " + round + " ===");
+            System.out.println("\nRepitetition " + round + "");
 
             List<Card> organizedCards;
             if (round == 1 || !(organizer instanceof RecentMistakesFirstSorter)) {
@@ -45,22 +46,36 @@ public class FlashCard {
 
             for (Card card : organizedCards) {
                 List<String> choices;
-                String question;
+                String questionText;
                 int correctIndex;
 
                 if (invertCards) {
-                    // Асуултыг хариулт болгоно, зөв хариултаар уг асуултыг таалгана
-                    question = card.getChoices().get(card.getCorrectIndex()) + " гэж ямар асуултад хамаарах вэ?";
-                    choices = new ArrayList<>(card.getChoices()); // card.getQuestion() оруулаагүй!
-                    choices.set(card.getCorrectIndex(), card.getQuestion()); // зөв хариулт - асуулт
-                    correctIndex = card.getCorrectIndex(); // зөвийн индекс хэвээр
+                    String correctAnswer = card.getChoices().get(card.getCorrectIndex());
+                    questionText = "Дараах хариулт аль асуултад тохирох вэ: " + correctAnswer;
+                
+                    List<String> otherQuestions = cards.stream()
+                            .map(Card::getQuestion)
+                            .filter(q -> !q.equals(card.getQuestion()))
+                            .distinct()
+                            .collect(Collectors.toList());
+                
+                    Collections.shuffle(otherQuestions);
+                    List<String> distractors = otherQuestions.stream()
+                            .limit(3)
+                            .collect(Collectors.toList());
+                
+                    choices = new ArrayList<>(distractors);
+                    choices.add(card.getQuestion()); 
+                    Collections.shuffle(choices);
+                
+                    correctIndex = choices.indexOf(card.getQuestion());
                 } else {
-                    question = card.getQuestion();
+                    questionText = card.getQuestion();
                     choices = card.getChoices();
                     correctIndex = card.getCorrectIndex();
                 }
 
-                System.out.println(question);
+                System.out.println(questionText);
                 for (int i = 0; i < choices.size(); i++) {
                     System.out.println((i + 1) + ": " + choices.get(i));
                 }
@@ -90,7 +105,7 @@ public class FlashCard {
             }
         }
 
-        System.out.println("\n=== Амжилтууд ===");
+        System.out.println("\n Амжилтууд ");
         for (Card card : cards) {
             if (AchievementChecker.checkRepeat(card)) {
                 System.out.println("REPEAT: " + card.getQuestion());
@@ -101,6 +116,8 @@ public class FlashCard {
         }
         if (AchievementChecker.checkCorrect(cards)) {
             System.out.println("CORRECT: Бүх картыг зөв хариулсан!");
+        } else{
+            System.out.println("Ямар нэгэн амжилт гаргаагүй байна");
         }
     }
 }
