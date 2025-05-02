@@ -20,16 +20,16 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build with Maven
-      working-directory: FlashCardB210910042/BiyDaalt
-      run: mvn -B package
-
-    - name: Run JUnit tests
-      working-directory: FlashCardB210910042/BiyDaalt
-      run: mvn test
-
     # - name: Build with Maven
-    #   run: mvn -B package --file FlashCardB210910042/BiyDaalt/pom.xml
+    #   working-directory: FlashCardB210910042/BiyDaalt
+    #   run: mvn -B package
 
     # - name: Run JUnit tests
+    #   working-directory: FlashCardB210910042/BiyDaalt
     #   run: mvn test
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Run JUnit tests
+      run: mvn test
